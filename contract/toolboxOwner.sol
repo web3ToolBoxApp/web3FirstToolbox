@@ -7,70 +7,84 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 
 contract ToolBoxOwner is ERC721, ERC721Enumerable,ERC721Burnable{
-    //three type of nft
-   
+    using Counters for Counters.Counter;
+    Counters.Counter private _tokenIdCounter;
+    // Three types of NFTs
     uint public constant originOwnerID = 0;
     uint public constant earlyOwnerID = 1;
     uint public constant yearOwnerID = 2;
 
+    // Cap for each type of NFT
     uint public constant originOwnerCap = 100;
     uint public constant earlyOwnerCap = 500;
 
-    
-    /** record the nft is which type 
-        key:tokenId
-        value == 0 originOwner,
-        value == 1 earlyOwner
-        value == 2 yearOwner **/
+    // Mapping to record the type of each NFT
     mapping (uint => uint) private _typeInfo;
-    function getTokenType(uint tokenId) public view returns(uint typeID){
+
+    /**
+    * @dev Returns the type of the token.
+    * @param tokenId The token ID.
+    * @return typeID The type of the token.
+    */
+    function getTokenType(uint tokenId) public view returns(uint typeID) {
         typeID = _typeInfo[tokenId];
     }
 
-    /** record the three types of nft amount 
-        key:typeId
-        key == 0 originOwner,
-        key == 1 earlyOwner
-        key == 2 yearOwner 
-        value number**/
+    // Mapping to record the current amount of each type of NFT
     mapping (uint => uint) private _typeCurentAmount;
-    function getTypeCurentAmount(uint typeID) public view returns(uint amount){
+
+    /**
+    * @dev Returns the current amount of tokens for the given type.
+    * @param typeID The type ID.
+    * @return amount The current amount of tokens.
+    */
+    function getTypeCurentAmount(uint typeID) public view returns(uint amount) {
         amount = _typeCurentAmount[typeID];
-    }
+    } 
 
-    using Counters for Counters.Counter;
-    Counters.Counter private _tokenIdCounter;
-
-    /** yearOwner have this info 
-        key = tokenId
-        value = timeStamp **/
+    // Mapping to record the expiration time for yearOwner NFTs
     mapping (uint => uint) private _expiredTimeInfo;
-    function getExpiredTime(uint tokenId) public view returns(uint time){
+
+    /**
+    * @dev Returns the expiration time for the given token.
+    * @param tokenId The token ID.
+    * @return time The expiration time for the token.
+    */
+    function getExpiredTime(uint tokenId) public view returns(uint time) {
         time = _expiredTimeInfo[tokenId];
     }
 
-    /** record NFT obtain time
-        key = nft obtain address
-        key = nft id
-        value = timeStamp
-        **/
-    
+    // Mapping to record the NFT obtain time for each owner and token ID
     mapping (address => mapping (uint => uint)) private _nftObtainTimeInfo;
-    function getNftObtainTime(address owner,uint tokenId) public view returns(uint time){
+
+    /**
+    * @dev Returns the NFT obtain time for the given owner and token ID.
+    * @param owner The owner of the NFT.
+    * @param tokenId The token ID.
+    * @return time The NFT obtain time.
+    */
+    function getNftObtainTime(address owner, uint tokenId) public view returns(uint time) {
         time = _nftObtainTimeInfo[owner][tokenId];
     }
+
     address public manager;
-    modifier onlyManager{
-        require(msg.sender == manager,"not manager");
+    modifier onlyManager {
+        require(msg.sender == manager, "Not manager");
         _;
     }
 
     address public saleContractAddress;
-    function setSaleContractAddress(address _saleContractAddress) public onlyManager{
+
+    /**
+    * @dev Sets the address of the sale contract.
+    * @param _saleContractAddress The address of the sale contract.
+    */
+    function setSaleContractAddress(address _saleContractAddress) public onlyManager {
         saleContractAddress = _saleContractAddress;
     }
-    modifier onlySaleContract{
-        require(msg.sender == saleContractAddress,"not SaleContract");
+
+    modifier onlySaleContract {
+        require(msg.sender == saleContractAddress, "Not SaleContract");
         _;
     }
 
@@ -78,12 +92,17 @@ contract ToolBoxOwner is ERC721, ERC721Enumerable,ERC721Burnable{
         manager = msg.sender;
     }
 
-    function safeMint(address to,uint typeID) public onlySaleContract {
-        require(typeID < 3,"don't have this type");
-        if (typeID == originOwnerID){
-            require(_typeCurentAmount[typeID] < originOwnerCap,"achieve cap");
-        }else if (typeID == earlyOwnerID){
-            require(_typeCurentAmount[typeID] < earlyOwnerID,"achieve cap");
+    /**
+    * @dev Safely mints a new NFT to the given address.
+    * @param to The address to mint the NFT to.
+    * @param typeID The type of the NFT to mint.
+    */
+    function safeMint(address to, uint typeID) public onlySaleContract {
+        require(typeID < 3, "Invalid type");
+        if (typeID == originOwnerID) {
+            require(_typeCurentAmount[typeID] < originOwnerCap, "Reached cap");
+        } else if (typeID == earlyOwnerID) {
+            require(_typeCurentAmount[typeID] < earlyOwnerCap, "Reached cap");
         }
 
         uint256 tokenId = _tokenIdCounter.current();
@@ -91,14 +110,12 @@ contract ToolBoxOwner is ERC721, ERC721Enumerable,ERC721Burnable{
         _safeMint(to, tokenId);
         _typeInfo[tokenId] = typeID;
 
-        if (typeID == yearOwnerID){
-            //a year time = 365 * 24 * 60 * 60 = 31536000
+        if (typeID == yearOwnerID) {
+            // Set a year time = 365 * 24 * 60 * 60 = 31536000
             _expiredTimeInfo[tokenId] = block.timestamp + 31536000;
         }
         _typeCurentAmount[typeID] += 1;
     }
-
-    // The following functions are overrides required by Solidity.
 
     function _beforeTokenTransfer(address from, address to, uint256 tokenId, uint256 batchSize)
         internal
@@ -123,18 +140,23 @@ contract ToolBoxOwner is ERC721, ERC721Enumerable,ERC721Burnable{
     {
         return super.supportsInterface(interfaceId);
     }
-    function burn(uint256[] calldata tokenIds) public onlyManager{
-       for (uint i = 0;i<tokenIds.length;++i){
-           uint tokenId = tokenIds[i];
-           burn(tokenId);
-       }       
+
+    /**
+    * @dev Burns the year nft after expired
+    * @param tokenIds The array of token IDs to burn.
+    */
+    function burn(uint256[] calldata tokenIds) public onlyManager {
+        for (uint i = 0; i < tokenIds.length; ++i) {
+            uint tokenId = tokenIds[i];
+            burn(tokenId);
+        }       
     }
-    function burn(uint256 tokenId) public override(ERC721Burnable) onlyManager{
+
+    function burn(uint256 tokenId) public override(ERC721Burnable) onlyManager {
         uint curTime = block.timestamp;
-        if(_typeInfo[tokenId] == yearOwnerID && curTime > _expiredTimeInfo[tokenId])
-        {
+        if (_typeInfo[tokenId] == yearOwnerID && curTime > _expiredTimeInfo[tokenId]) {
             _burn(tokenId);
         }
     }
-    
+
 }

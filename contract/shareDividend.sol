@@ -10,37 +10,51 @@ interface IToolBoxOwner is IERC721Enumerable{
 }
 
 contract ShareDividend is Ownable{
-    //one month = 30 * 24 * 60 * 60 = 2592000
-    uint public constant period  = 2592000;
+    // One month = 30 * 24 * 60 * 60 = 2592000 seconds
+    uint public constant period = 2592000;
     uint public startTime;
-    //period time = startTime + period * curRound
     uint public curRound;
-   
 
-    //key : round value : value
+    // Mapping to store the profit for each round
     mapping (uint => uint) public roundProfitInfo;
-    //key : round value : nft number
+
+    // Mapping to store the number of shares for each round
     mapping (uint => uint) public roundShareNum;
-    //      timestamp         nftOwner   withdraw or not
+
+    // Mapping to track the withdrawal state of each round for each owner
     mapping (uint => mapping (address => bool)) public withdrawState;
-    // after three month empty 3 month ago profit add to current month
+
+    // Mapping to track if the profit for a round has been emptied to the next round
     mapping (uint => bool) private emptyRoundProfit;
 
-    function setStartTime(uint time) public onlyOwner{
+    /**
+    * @dev Sets the start time for dividend calculation.
+    * @param time The start time.
+    */
+    function setStartTime(uint time) public onlyOwner {
         startTime = time;
     }
-    
+
     IToolBoxOwner nft;
-    function setNft(address nftAddress) public onlyOwner{
+
+    /**
+    * @dev Sets the address of the NFT contract.
+    * @param nftAddress The address of the NFT contract.
+    */
+    function setNft(address nftAddress) public onlyOwner {
         nft = IToolBoxOwner(nftAddress);
     }
-    
-    function emptyProfit(uint round) public onlyOwner{
+
+    /**
+    * @dev Empties the profit from a previous round to the current round.
+    * @param round The round to empty the profit from.
+    */
+    function emptyProfit(uint round) public onlyOwner {
         _emptyProfit(round);
     }
 
     function _emptyProfit(uint round) internal {
-        require(!emptyRoundProfit[round],"already empty this round profit");
+        require(!emptyRoundProfit[round], "Already emptied this round's profit");
         roundProfitInfo[round + 3] += roundProfitInfo[round];
         roundProfitInfo[round] = 0;
         emptyRoundProfit[round] = true;
@@ -50,35 +64,51 @@ contract ShareDividend is Ownable{
         uint curtime = block.timestamp;
         curRound = (curtime - startTime) / period;
         uint curPeriod = startTime + curRound * period;
-        if (curPeriod > 3 && !emptyRoundProfit[curPeriod - 3]){
+        if (curPeriod > 3 && !emptyRoundProfit[curPeriod - 3]) {
             _emptyProfit(curPeriod - 3);
         }
         roundProfitInfo[curRound] += msg.value;
         roundShareNum[curRound] = nft.totalSupply();
     }
 
-    
-    function  withdrawShare(uint round) public{
+    /**
+    * @dev Event emitted when an owner withdraws their share.
+    * @param who The address of the owner.
+    * @param avaliableShare The number of available shares.
+    * @param shareAmount The amount of share to withdraw.
+    */
+    event withdrawShareEvent(address who, uint avaliableShare, uint shareAmount);
+
+    /**
+    * @dev Withdraws the share for a specific round.
+    * @param round The round to withdraw the share from.
+    */
+    function withdrawShare(uint round) public {
         uint withdrawTime = startTime + round * period;
         address ownerAddress = msg.sender;
-        require(!withdrawState[round][ownerAddress],"already withdraw");
+        require(!withdrawState[round][ownerAddress], "Already withdrawn");
         uint balance = nft.balanceOf(ownerAddress);
-        require(balance > 0,"dont have right to withdraw share");
+        require(balance > 0, "Not eligible to withdraw share");
         uint roundProfit = roundProfitInfo[round];
-        require(roundProfit > 0,"curent round dont have profit");
+        require(roundProfit > 0, "No profit available for the current round");
         uint avaliableShare = 0;
-        for (uint i=0;i<balance;++i){
-            uint tokenId = nft.tokenOfOwnerByIndex(ownerAddress,i);
+        for (uint i = 0; i < balance; ++i) {
+            uint tokenId = nft.tokenOfOwnerByIndex(ownerAddress, i);
             uint nftObtainTime = nft.getNftObtainTime(ownerAddress, tokenId);
-            if (withdrawTime > nftObtainTime && (withdrawTime - nftObtainTime) >= period)
-            {
+            if (withdrawTime > nftObtainTime && (withdrawTime - nftObtainTime) >= period) {
                 avaliableShare += 1;
             }
         }
         uint shareAmount = avaliableShare * roundProfit / roundShareNum[round];
         payable(ownerAddress).transfer(shareAmount);
+        emit withdrawShareEvent(ownerAddress, avaliableShare, shareAmount);
     }
+
+    /**
+    * @dev Function to receive Ether and record the profit for the current round.
+    */
     function receiveShare() public payable {
         _recordProfit();
     }
+
 }
