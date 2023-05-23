@@ -92,7 +92,8 @@ contract ToolSale is Ownable{
     function buyTool(uint itemId,address inviter) public payable{ 
         //first buy add inviter,once add can not change
         if (inviteInfo[msg.sender] == address(0)){
-            inviteInfo[msg.sender] = inviter;
+            require(inviter != msg.sender,"inviter can't be yourself");
+            inviteInfo[msg.sender] = inviter;            
         }
         _divideShare();
         emit buySuccess(msg.sender,itemId,msg.value,0);
@@ -137,6 +138,7 @@ contract ToolSale is Ownable{
     function mintNft(uint typeID, address inviter) public payable {
         // First buy adds the inviter, once added it cannot be changed
         if (inviteInfo[msg.sender] == address(0)) {
+            require(inviter != msg.sender,"inviter can't be yourself");
             inviteInfo[msg.sender] = inviter;
         }
 
