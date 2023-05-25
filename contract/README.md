@@ -42,7 +42,7 @@ ShareDividend 合约用于记录 NFT 持有人的分红信息。具体规则如�
 合约地址：
 - ToolSale:https://testnet.bscscan.com/address/0xc483efb7a221da2938be3cec5e754cad8d2439d2
 - ToolBoxOwner:https://testnet.bscscan.com/address/0xc9a96acef573649Ac20B6F9eeB5E1E7d5a632068
-- ShareDividend:https://testnet.bscscan.com/address/0x9BEf361e67AE55500ae8FA7428677Aff352A53E5
+- ShareDividend:https://testnet.bscscan.com/address/0x4eb31334F43f6EbFEcf9289Be9379B9321Edfb8F
 
 # Tool Sale Contract
 

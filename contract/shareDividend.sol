@@ -63,7 +63,6 @@ contract ShareDividend is Ownable{
     function _recordProfit() internal {
         uint curtime = block.timestamp;
         curRound = (curtime - startTime) / period;
-        uint curRound = startTime + curRound * period;
         if (curRound > 3 && !emptyRoundProfit[curRound - 3]) {
             _emptyProfit(curRound - 3);
         }
@@ -101,6 +100,7 @@ contract ShareDividend is Ownable{
         }
         uint shareAmount = avaliableShare * roundProfit / roundShareNum[round];
         payable(ownerAddress).transfer(shareAmount);
+        withdrawState[round][ownerAddress] = true;
         emit withdrawShareEvent(ownerAddress, avaliableShare, shareAmount);
     }
 
