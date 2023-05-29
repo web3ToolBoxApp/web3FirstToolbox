@@ -71,6 +71,24 @@ contract ShareDividend is Ownable{
     }
 
     /**
+    * @dev get specific share of nft owner for a specific round.
+    * @param owner The owner of the NFT.
+    * @param round The round to withdraw the share from.
+    */
+    function getOwnerShare(address owner, uint round) public view returns(uint) {
+        uint balance = nft.balanceOf(owner);
+        uint avaliableShare = 0;
+        for (uint i = 0; i < balance; ++i) {
+            uint tokenId = nft.tokenOfOwnerByIndex(owner, i);
+            uint nftObtainTime = nft.getNftObtainTime(owner, tokenId);
+            if (startTime + round * period > nftObtainTime && (startTime + round * period - nftObtainTime) >= period) {
+                avaliableShare += 1;
+            }
+        }
+        return avaliableShare * roundProfitInfo[round] / roundShareNum[round];
+    }
+
+    /**
     * @dev Event emitted when an owner withdraws their share.
     * @param who The address of the owner.
     * @param avaliableShare The number of available shares.

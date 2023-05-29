@@ -42,7 +42,7 @@ ShareDividend 合约用于记录 NFT 持有人的分红信息。具体规则如�
 合约地址：
 - ToolSale:https://testnet.bscscan.com/address/0xc483efb7a221da2938be3cec5e754cad8d2439d2
 - ToolBoxOwner:https://testnet.bscscan.com/address/0xc9a96acef573649Ac20B6F9eeB5E1E7d5a632068
-- ShareDividend:https://testnet.bscscan.com/address/0x4eb31334F43f6EbFEcf9289Be9379B9321Edfb8F
+- ShareDividend:https://testnet.bscscan.com/address/0x2D621CD95718f1a6278c7f0887F881748Bd40a34
 
 # Tool Sale Contract
 
@@ -222,6 +222,7 @@ ShareDividend 合约包含以下函数：
 - `emptyProfit(uint round)`：将上三轮的利润转移至当前轮。
 - `withdrawShare(uint round)`：提取特定轮次的股份。
 - `receiveShare()`：接收以太币并记录当前轮次的利润。
+- `getOwnerShare(address owner,uint round)`：获取某个地址在某个轮次的分红。
 
 ## 事件
 
