@@ -145,18 +145,18 @@ contract ToolSale is Ownable{
         uint value = msg.value;
 
         // Mint the NFT based on the specified type and value
-        if (typeID == nft.originOwnerID()) {
-            require(value == 5 ether, "value is not correct");
+        if (typeID == nft.genesisOwnerID()) {
+            require(value == 0.05 ether, "value is not correct");
             nft.safeMint(msg.sender, typeID);
             payable(owner()).transfer(value);
-        } else if (typeID == nft.earlyOwnerID()) {
-            require(value == 1 ether, "value is not correct");
+        } else if (typeID == nft.alphaOwnerID()) {
+            require(value == 0.01 ether, "value is not correct");
             nft.safeMint(msg.sender, typeID);
             payable(owner()).transfer(value);
         } 
         // The year owner nft divide the profits and distribute them among inviters, the share contract, and the team
         else if (typeID == nft.yearOwnerID()) {
-            require(value == 1 ether, "value is not correct");
+            require(value == 0.01 ether, "value is not correct");
             nft.safeMint(msg.sender, typeID);
             _divideShare();
         }

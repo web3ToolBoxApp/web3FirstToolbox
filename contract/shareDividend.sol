@@ -11,7 +11,8 @@ interface IToolBoxOwner is IERC721Enumerable{
 
 contract ShareDividend is Ownable{
     // One month = 30 * 24 * 60 * 60 = 2592000 seconds
-    uint public constant period = 2592000;
+    // For test One day to share profit
+    uint public constant period = 86400;
     uint public startTime;
     uint public curRound;
 
@@ -85,6 +86,9 @@ contract ShareDividend is Ownable{
                 avaliableShare += 1;
             }
         }
+        if (roundShareNum[round] == 0) {
+            return 0;
+        }
         return avaliableShare * roundProfitInfo[round] / roundShareNum[round];
     }
 
@@ -102,6 +106,7 @@ contract ShareDividend is Ownable{
     */
     function withdrawShare(uint round) public {
         uint withdrawTime = startTime + round * period;
+        require(block.timestamp > withdrawTime, "Not available to withdraw yet");
         address ownerAddress = msg.sender;
         require(!withdrawState[round][ownerAddress], "Already withdrawn");
         uint balance = nft.balanceOf(ownerAddress);

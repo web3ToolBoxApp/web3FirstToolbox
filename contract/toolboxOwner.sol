@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MITorigin
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
@@ -10,13 +10,13 @@ contract ToolBoxOwner is ERC721, ERC721Enumerable,ERC721Burnable{
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIdCounter;
     // Three types of NFTs
-    uint public constant originOwnerID = 0;
-    uint public constant earlyOwnerID = 1;
+    uint public constant genesisOwnerID = 0;
+    uint public constant alphaOwnerID = 1;
     uint public constant yearOwnerID = 2;
 
     // Cap for each type of NFT
-    uint public constant originOwnerCap = 100;
-    uint public constant earlyOwnerCap = 500;
+    uint public constant genesisOwnerCap = 100;
+    uint public constant alphaOwnerCap = 500;
 
     // Mapping to record the type of each NFT
     mapping (uint => uint) private _typeInfo;
@@ -28,6 +28,27 @@ contract ToolBoxOwner is ERC721, ERC721Enumerable,ERC721Burnable{
     */
     function getTokenType(uint tokenId) public view returns(uint typeID) {
         typeID = _typeInfo[tokenId];
+    }
+    
+    /**
+    * @dev Returns the type of the token.
+    * @param tokenId The token ID.
+    * @return url return the url of the token.
+    */
+    function tokenURI(uint256 tokenId)
+        public
+        view
+        override(ERC721)
+        returns (string memory url)
+    {
+        uint typeID = _typeInfo[tokenId];
+        if (typeID == genesisOwnerID){
+            url = "https://app.web3toolbox.net/NFTfiles/genesis.json";
+        }else if(typeID == alphaOwnerID){
+            url = "https://app.web3toolbox.net/NFTfiles/alpha.json";
+        }else if(typeID == yearOwnerID){
+            url = "https://app.web3toolbox.net/NFTfiles/year.json";
+        }
     }
 
     // Mapping to record the current amount of each type of NFT
@@ -99,10 +120,10 @@ contract ToolBoxOwner is ERC721, ERC721Enumerable,ERC721Burnable{
     */
     function safeMint(address to, uint typeID) public onlySaleContract {
         require(typeID < 3, "Invalid type");
-        if (typeID == originOwnerID) {
-            require(_typeCurentAmount[typeID] < originOwnerCap, "Reached cap");
-        } else if (typeID == earlyOwnerID) {
-            require(_typeCurentAmount[typeID] < earlyOwnerCap, "Reached cap");
+        if (typeID == genesisOwnerID) {
+            require(_typeCurentAmount[typeID] < genesisOwnerCap, "Reached cap");
+        } else if (typeID == alphaOwnerID) {
+            require(_typeCurentAmount[typeID] < alphaOwnerCap, "Reached cap");
         }
 
         uint256 tokenId = _tokenIdCounter.current();
@@ -112,7 +133,8 @@ contract ToolBoxOwner is ERC721, ERC721Enumerable,ERC721Burnable{
 
         if (typeID == yearOwnerID) {
             // Set a year time = 365 * 24 * 60 * 60 = 31536000
-            _expiredTimeInfo[tokenId] = block.timestamp + 31536000;
+            // to test set expire time to 1 day
+            _expiredTimeInfo[tokenId] = block.timestamp + 86400;
         }
         _typeCurentAmount[typeID] += 1;
     }

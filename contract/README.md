@@ -11,16 +11,16 @@ Tool Sale 合约是一个用于工具产品销售、NFT 铸造、邀请人分红
 Tool Sale 合约提供以下功能：
 
 - 工具销售：用户可以使用社区积分 W3FT 或 BNB 购买工具。
-- NFT Pass 卡铸造：用户可以使用不同数量的 BNB 铸造不同类型的 NFT Pass 卡，包括 originOwner、earlyOwner 和 yearOwner。其中，yearOwner 类型的 NFT 在一年后过期，并进行利润分红。其他类型的 NFT 收入将分配给开发团队。
+- NFT Pass 卡铸造：用户可以使用不同数量的 BNB 铸造不同类型的 NFT Pass 卡，包括 genesisOwner、alphaOwner 和 yearOwner。其中，yearOwner 类型的 NFT 在一年后过期，并进行利润分红。其他类型的 NFT 收入将分配给开发团队。
 - 邀请人机制：邀请人在购买人首次购买时绑定，一旦绑定将无法更改。
 - 销售利润分红：使用 BNB 购买工具或铸造 yearOwner NFT 时将进行利润分红，分红对象包括购买人的邀请人、NFT 持有人和项目团队。具体分红比例为：邀请人持有 NFT 获得 40% 分红，未持有 NFT 获得 20% 分红；NFT 持有人获得 30% 分红；项目团队获得剩余利润。
 - 社区积分 W3FT 的借用和奖励发放：由运营人员审批通过后会给对应地址发放社区积分 W3FT。
 
 ## ToolboxOwner 合约
 
-ToolboxOwner 合约是一个社区 NFT 合约，包含三种不同类型的 NFT：originOwner、earlyOwner 和 yearOwner。其中，yearOwner 类型的 NFT 在一年后过期，并会被运营人员销毁。
-- originOwner铸造上限：100
-- earlyOwner铸造上限：500
+ToolboxOwner 合约是一个社区 NFT 合约，包含三种不同类型的 NFT：genesisOwner、alphaOwner 和 yearOwner。其中，yearOwner 类型的 NFT 在一年后过期，并会被运营人员销毁。
+- genesisOwner铸造上限：100
+- alphaOwner铸造上限：500
 - yearOwner铸造上限：无上限
 
 ## ShareDividend 合约
@@ -35,14 +35,14 @@ ShareDividend 合约用于记录 NFT 持有人的分红信息。具体规则如�
 
 合约已在bsc测试网部署，并且开源，参与测试的小伙伴可以在discord测试反馈频道提出bug,后续将针对bug严重程度给予奖励，为方便测试已对合约作出以下调整
 
-- Mint NFT 所需金额调整为，originOwner 0.05 TBNB，earlyOwner 0.01 TBNB, yearOwner 0.01TBNB
+- Mint NFT 所需金额调整为，genesisOwner 0.05 TBNB，alphaOwner 0.01 TBNB, yearOwner 0.01TBNB
 - yearOwner NFT 过期时间设置为一天
 - 每轮分红设置为一天
 
 合约地址：
-- ToolSale:https://testnet.bscscan.com/address/0xc483efb7a221da2938be3cec5e754cad8d2439d2
-- ToolBoxOwner:https://testnet.bscscan.com/address/0xc9a96acef573649Ac20B6F9eeB5E1E7d5a632068
-- ShareDividend:https://testnet.bscscan.com/address/0x2D621CD95718f1a6278c7f0887F881748Bd40a34
+- ToolSale:https://testnet.bscscan.com/address/0x14B0dBC0Cf65639a4cE1416728b8833Cccd25bf8
+- ToolBoxOwner:https://testnet.bscscan.com/address/0x783443f9f41baA86EdA15D4A0A85C0b01e507a60
+- ShareDividend:https://testnet.bscscan.com/address/0x582d4F68B039eE8556B2C25C5a409d5B6939010d
 
 # Tool Sale Contract
 
@@ -131,7 +131,7 @@ ToolBoxOwner 合约是一个基于 ERC721 标准的合约，用于管理工具�
 
 ToolBoxOwner 合约提供以下功能：
 
-- 铸造不同类型的 NFT，包括原始所有者（originOwner）、早期所有者（earlyOwner）和年度所有者（yearOwner）。
+- 铸造不同类型的 NFT，包括genesis所有者（genesisOwner）、alpha所有者（alphaOwner）和年度所有者（yearOwner）。
 - 设置每种类型 NFT 的铸造上限。
 - 记录每个 NFT 的类型、当前数量和到期时间。
 - 获取特定 NFT 的类型、当前数量、到期时间和获得时间。
