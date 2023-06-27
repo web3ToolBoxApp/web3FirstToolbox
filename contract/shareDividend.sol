@@ -105,7 +105,7 @@ contract ShareDividend is Ownable{
     * @param round The round to withdraw the share from.
     */
     function withdrawShare(uint round) public {
-        uint withdrawTime = startTime + round * period;
+        uint withdrawTime = startTime + (round + 1) * period;
         require(block.timestamp > withdrawTime, "Not available to withdraw yet");
         address ownerAddress = msg.sender;
         require(!withdrawState[round][ownerAddress], "Already withdrawn");

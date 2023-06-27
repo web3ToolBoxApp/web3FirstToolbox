@@ -171,7 +171,7 @@ contract ToolSale is Ownable{
     function loan(bytes32[] calldata proof) public {
         require(!isLoan[msg.sender], "please pay back loan");
         bytes32 leaf = keccak256(abi.encodePacked(msg.sender));
-        require(MerkleProof.verifyCalldata(proof, leaf, loanRoot), "Not qualified");
+        require(MerkleProof.verifyCalldata(proof, loanRoot, leaf), "Not qualified");
         token.mint(msg.sender, loanAmount);
         isLoan[msg.sender] = true;
 
@@ -197,7 +197,7 @@ contract ToolSale is Ownable{
     function withdraw(bytes32[] calldata proof, uint256 amount, uint256 timeStamp) public {
         bytes32 leaf = keccak256(abi.encodePacked(msg.sender, amount, timeStamp));
         require(!isWithdraw[leaf], "Already withdraw");
-        require(MerkleProof.verifyCalldata(proof, leaf, withdrawRoot), "Not qualified");
+        require(MerkleProof.verifyCalldata(proof, withdrawRoot,leaf), "Not qualified");
         token.mint(msg.sender, amount);
         isWithdraw[leaf] = true;
 
