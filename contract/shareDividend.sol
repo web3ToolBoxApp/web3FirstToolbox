@@ -12,7 +12,7 @@ interface IToolBoxOwner is IERC721Enumerable{
 contract ShareDividend is Ownable{
     // One month = 30 * 24 * 60 * 60 = 2592000 seconds
     // For test One day to share profit
-    uint public constant period = 86400;
+    uint public constant period = 2592000;
     uint public startTime;
     uint public curRound;
 

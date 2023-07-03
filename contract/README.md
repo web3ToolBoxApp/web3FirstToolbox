@@ -31,6 +31,11 @@ ShareDividend 合约用于记录 NFT 持有人的分红信息。具体规则如�
 - 当月获得 NFT 的地址将在下一个月才有分红资格。
 - 每过 3 个月，3 个月前未提取分红的月份利润将累积到当前月份。
 
+# 主网合约地址
+- ToolSale:https://bscscan.com/address/0x3470593349f0d2b1bC5fcFd00D0Fd27A1F341A0b
+- ToolBoxOwner:https://bscscan.com/address/0x35A3Ee538BbaC345B0411A97Fe3ecc614bfDA259
+- ShareDividend:https://bscscan.com/address/0x160A2EC60bE0452187e0381001D4BA87ce34975e
+
 # 测试网合约说明
 
 合约已在bsc测试网部署，并且开源，参与测试的小伙伴可以在discord测试反馈频道提出bug,后续将针对bug严重程度给予奖励，为方便测试已对合约作出以下调整
